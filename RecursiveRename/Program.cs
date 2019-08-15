@@ -6,38 +6,43 @@ namespace RecursiveRename
 {
     class Program
     {
+        static int _count = 0;
+        
         static void Main(string[] args)
         {
             var renameFolderPath = Path.Combine("c:", "repos", "healthtracker-app", "src");
+
             Console.WriteLine(renameFolderPath);
-            RenameFolder(renameFolderPath);
+
+            RenameFilesInFolder(renameFolderPath);
+
+            Console.WriteLine($"");
+            Console.WriteLine($"Total file(s) renamed: {_count}");
         }
 
-        private static void RenameFolder(string renameFolderPath)
+        private static void RenameFilesInFolder(string renameFolderPath)
         {
+            RenameFiles(renameFolderPath, ".spec.ts", ".spec.ts.old");
+
             if (Directory.GetDirectories(renameFolderPath).Any())
+            { 
                 foreach (var folder in Directory.GetDirectories(renameFolderPath))
-                {
-                    if (Directory.GetDirectories(folder).Any())
-                        RenameFolder(folder);
-                    else
-                    {
-                        RenameFiles(folder);
-                    }
-                }
-            else
-            {
-                RenameFiles(renameFolderPath);
+                    RenameFilesInFolder(folder);
             }
         }
-
-        private static void RenameFiles(string folder)
+        
+        private static void RenameFiles(string folder, string matchText, string replaceText)
         {
-            foreach (var file in Directory.GetFiles(folder, "*.spec.ts"))
+            foreach (var file in Directory.GetFiles(folder, $"*{matchText}"))
             {
-                var newFileName = file.Split(".spec.ts")[0] + ".spec.old.ts";
-                File.Move(file, newFileName);
-                Console.WriteLine($"Renamed {file} => {newFileName}");
+                var splitText = file.Split(matchText);
+                if (splitText.Any())
+                {
+                    var newFileName = splitText[0] + replaceText;
+                    File.Move(file, newFileName); // the actual renaming
+                    _count += 1;
+                    Console.WriteLine($"Renamed {file} => {newFileName}");
+                }
             }
         }
     }
