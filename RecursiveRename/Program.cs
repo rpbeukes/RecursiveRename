@@ -7,7 +7,7 @@ namespace RecursiveRename
     class Program
     {
         static int _count = 0;
-        
+
         static void Main(string[] args)
         {
             var renameFolderPath = Path.Combine("c:", "repos", "healthtracker-app", "src");
@@ -22,15 +22,12 @@ namespace RecursiveRename
 
         private static void RenameFilesInFolder(string renameFolderPath)
         {
-            RenameFiles(renameFolderPath, ".spec.ts", ".spec.ts.old");
+            RenameFiles(renameFolderPath, ".spec.ts.old", ".spec.ts");
 
-            if (Directory.GetDirectories(renameFolderPath).Any())
-            { 
-                foreach (var folder in Directory.GetDirectories(renameFolderPath))
-                    RenameFilesInFolder(folder);
-            }
+            foreach (var folder in Directory.GetDirectories(renameFolderPath))
+                RenameFilesInFolder(folder);
         }
-        
+
         private static void RenameFiles(string folder, string matchText, string replaceText)
         {
             foreach (var file in Directory.GetFiles(folder, $"*{matchText}"))
